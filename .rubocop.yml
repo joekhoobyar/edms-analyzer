@@ -1,0 +1,21 @@
+AllCops:
+  TargetRubyVersion: 2.5
+  Exclude:
+    - coverage/**/*
+    - target/**/*
+    - tmp/**/*
+    - Jenkinsfile
+    - jenkins/**/*
+Style/FormatStringToken:
+  Enabled: false
+Metrics/BlockLength:
+  Exclude:
+    - Rakefile
+    - Guardfile
+    - '**/*.gemspec'
+    - spec/**/*
+    - lib/**/*.rake
+Layout/LineLength:
+  Max: 99
+  Exclude:
+    - Guardfile

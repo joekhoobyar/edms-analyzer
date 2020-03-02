@@ -10,14 +10,14 @@ module EDMS
       def initialize(text: nil, metadata: {})
         text = Regexp.new text, Regexp::IGNORECASE if text.is_a? String
         @text = text
-        @metadata = Hash[ metadata.map do |k,v|
+        @metadata = Hash[metadata.map do |k, v|
           v = Regexp.new v, Regexp::IGNORECASE if v.is_a? String
           [k, v]
-        end ]
+        end]
       end
 
       def match?(document)
-        metadata.all? { |key,pattern| document.metadata[key].to_s =~ pattern } &&
+        metadata.all? { |key, pattern| document.metadata[key].to_s =~ pattern } &&
           (text.nil? || document.text =~ text)
       end
     end

@@ -10,6 +10,7 @@ module EDMS
     # REST microservice entry point
     class Web < Roda
       plugin :empty_root
+      plugin :json
       plugin :json_parser
       plugin :symbol_status
 
@@ -21,7 +22,7 @@ module EDMS
         else
           response.status = 400
         end
-        { 'message' => text, 'result' => nil }.to_json
+        { 'message' => text, 'result' => nil }
       end
 
       route do |r|
@@ -39,7 +40,7 @@ module EDMS
             document = analyzer.call document
             decorator.decorate document
             response.status = 201
-            { 'message' => "Classifying document ##{document.id}", 'result' => [] }.to_json
+            { 'message' => "Classifying document ##{document.id}", 'result' => [] }
           end
         end
       end

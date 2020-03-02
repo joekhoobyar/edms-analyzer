@@ -23,6 +23,20 @@ module EDMS
       @metadata ||= metadata!
     end
 
+    # @param document [EDMS::Document]
+    #   the document to decorate with metadata
+    # @return [Hash{String => Object}]
+    #   the applied metadata
+    def decorate(document)
+      with_client do |client|
+        mayan_doc = client.document(document.id)
+        existing = existing_metadata(mayan_doc)
+        document.metadata.each do |name, value|
+          write_metadata mayan_doc, existing, name, value
+        end
+      end
+    end
+
     protected
 
     def metadata!
@@ -34,13 +48,22 @@ module EDMS
       end
     end
 
-    def write_document_metadata(document_id, metadata_name, metadata_value)
-      metadata_id = metadata[metadata_name.to_s]
+    def existing_metadata(mayan_doc)
+      existing = {}
+      mayan_doc.metadata.results.each do |mayan_dm|
+        existing[mayan_dm.value[:metadata_type][:name]] = mayan_dm.value[:id]
+      end
+      existing
+    end
+
+    def write_metadata(mayan_doc, existing, metadata_name, metadata_value)
+      metadata_id = existing[metadata_name.to_s]
       raise ArgumentError, "no such metadata named '#{metadata_name}'" if metadata_id.nil?
 
-      with_client do |client|
-        client.document(document_id).metadata(metadata_id).patch('value' => metadata_value).read
-      end
+      response = mayan_doc.metadata(metadata_id).patch('value' => metadata_value)
+      raise Async::REST::ResponseError, response unless response.success?
+
+      response.close
     end
 
     private

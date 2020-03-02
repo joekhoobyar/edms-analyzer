@@ -19,15 +19,19 @@ module EDMS
       pattern = Regexp.new Regexp.escape(pattern.to_s), Regexp::IGNORECASE if pattern.is_a? String
       @pattern = pattern
       @action = action
-      @action = ->(data) { data.merge(action) } if action.is_a? Hash
+      @action = ->(data) { data.with_metadata(action) } if action.is_a? Hash
     end
 
-    def ===(text)
-      @pattern === text # rubocop:disable Style/CaseEquality
-    end
-
-    def call(data)
-      @action.call(data)
+    # @param document [EDMS::Document]
+    #   a representation of the document to classify
+    # @return [EDMS::Document]
+    #   either a newly classified document, or the original document
+    def call(document)
+      if document.text =~ pattern
+        @action.call(document)
+      else
+        document
+      end
     end
   end
 end

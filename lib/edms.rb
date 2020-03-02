@@ -8,11 +8,14 @@ module EDMS
   module Types
     include Dry.Types()
 
-    MetadataMap = Types::Hash.map(Types::String, Types::Any).default { {} }
+    MetadataKey   = Types::Coercible::String
+    MetadataValue = Types::Any
+    MetadataMap   = Types::Hash.map(MetadataKey, MetadataValue).default { {} }
   end
 
   autoload :Classifier, 'edms/classifier'
+  autoload :Document, 'edms/document'
   autoload :Mayan, 'edms/mayan'
   autoload :MayanDecorator, 'edms/mayan_decorator'
-  autoload :TextAnalyzer, 'edms/classifier'
+  autoload :TextAnalyzer, 'edms/text_analyzer'
 end

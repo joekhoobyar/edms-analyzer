@@ -4,19 +4,16 @@
 require 'json'
 require 'async'
 $LOAD_PATH << 'lib'
-require 'edms/text_analyzer'
-require 'edms/mayan_decorator'
+require 'edms'
 
 analyzer = EDMS::TextAnalyzer.new classifiers: [
   ['Shanks Enterprises', { vendor_name: 'Shanks' }]
 ]
-metadata = analyzer.call($stdin.read)
+document = analyzer.call EDMS::Document.new(id: 14, type: 1, text: $stdin.read)
 
-$stdout.puts metadata.to_json
-$stdout.puts ''
+$stdout.puts document.inspect
 
 Async do
-  decorator = EDMS::MayanDecorator.new 1
-  $stdout.puts decorator.metadata.inspect
-  decorator.send :write_document_metadata, 12, :vendor_name, 'Shanks'
+  decorator = EDMS::MayanDecorator.new document.type
+  $stdout.puts decorator.decorate(document)
 end

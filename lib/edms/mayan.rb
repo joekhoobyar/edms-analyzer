@@ -38,7 +38,11 @@ module EDMS
     # Represents a list of "document metadata" in +mayan-edms+.
     class DocumentMetadatas < Representation
       def results
-        value[:results]
+        value[:results].map do |result|
+          DocumentMetadata.new @resource.with(path: result[:id].to_s),
+                               metadata: metadata,
+                               value: result
+        end
       end
     end
 

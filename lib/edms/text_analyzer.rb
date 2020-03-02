@@ -10,10 +10,12 @@ module EDMS
       @classifiers = classifiers.map { |a| EDMS::Classifier[*a] }
     end
 
-    def call(text, data = {})
-      @classifiers
-        .select { |classifier| classifier === text } # rubocop:disable Style/CaseEquality
-        .inject(data) { |accum, classifier| classifier.call(accum) }
+    # @param document [EDMS::Document]
+    #   a representation of the document to classify
+    # @return [EDMS::Document]
+    #   either a newly classified document, or the unmodified original document
+    def call(document)
+      @classifiers.inject(document) { |accum, classifier| classifier.call(accum) }
     end
   end
 end

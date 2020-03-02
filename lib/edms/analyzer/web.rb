@@ -10,6 +10,18 @@ module EDMS
     class Web < Roda
       plugin :empty_root
       plugin :json_parser
+      plugin :symbol_status
+
+      plugin :error_handler do |e|
+        text = e.message
+        case e
+        when Dry::Struct::Error
+          response.status = :unprocessable_entity
+        else
+          response.status = 400
+        end
+        text
+      end
 
       route do |r|
         response['Content-Type'] = 'application/json'

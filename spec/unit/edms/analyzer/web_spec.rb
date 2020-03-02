@@ -13,7 +13,7 @@ describe EDMS::Analyzer::Web, roda: :app do
         post '/analyses/documents', { 'foo' => 'bar' }
       end
 
-      its(:status) { is_expected.to eq(400) }
+      its(:status) { is_expected.to eq(422) }
     end
 
     describe 'good submission' do

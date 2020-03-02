@@ -9,11 +9,11 @@ require 'edms'
 analyzer = EDMS::TextAnalyzer.new classifiers: [
   ['Shanks Enterprises', { vendor_name: 'Shanks' }]
 ]
-document = analyzer.call EDMS::Document.new(id: 14, type: 1, text: $stdin.read)
+document = analyzer.call EDMS::Document.new(id: 16, type: 1, text: $stdin.read)
 
 $stdout.puts document.inspect
 
 Async do
-  decorator = EDMS::MayanDecorator.new document.type
+  decorator = EDMS::MayanDecorator.new
   $stdout.puts decorator.decorate(document)
 end

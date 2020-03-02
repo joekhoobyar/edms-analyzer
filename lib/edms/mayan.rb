@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'async/http/endpoint'
 require 'async/rest/representation'
 
 module EDMS
@@ -22,12 +23,27 @@ module EDMS
 
     # Represents a "document" in +mayan-edms+.
     class Document < Representation
-      def metadata(id = nil)
+      def document_metadata(id = nil)
         if id.nil?
           with DocumentMetadatas, path: 'metadata/'
         else
           with DocumentMetadata, path: "metadata/#{id}/"
         end
+      end
+
+      def document_type
+        endpoint = Async::HTTP::Endpoint.parse(result[:document_type][:url])
+        DocumentType.new @resource.with(path: endpoint.path),
+                         metadata: metadata,
+                         value: result[:document_type]
+      end
+
+      def document_metadata_map
+        @document_metadata_map ||= document_metadata_map!
+      end
+
+      def document_metadata_map!(from = document_metadata)
+        Hash[from.results.map { |r| [r.value[:metadata_type][:name], r] }]
       end
     end
 
@@ -39,7 +55,8 @@ module EDMS
     class DocumentMetadatas < Representation
       def results
         value[:results].map do |result|
-          DocumentMetadata.new @resource.with(path: result[:id].to_s),
+          endpoint = Async::HTTP::Endpoint.parse(result[:url])
+          DocumentMetadata.new @resource.with(path: endpoint.path),
                                metadata: metadata,
                                value: result
         end
@@ -50,6 +67,14 @@ module EDMS
     class DocumentType < Representation
       def metadata_types
         with DocumentTypeMetadataTypes, path: 'metadata_types/'
+      end
+
+      def metadata_type_map
+        @metadata_type_map ||= metadata_type_map!
+      end
+
+      def metadata_type_map!(from = metadata_types)
+        Hash[from.results.map { |r| r[:metadata_type].values_at(:name, :id) }]
       end
     end
 

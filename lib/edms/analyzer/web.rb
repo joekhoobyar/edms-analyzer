@@ -9,14 +9,23 @@ module EDMS
     # REST microservice entry point
     class Web < Roda
       plugin :empty_root
+      plugin :json_parser
 
       route do |r|
         response['Content-Type'] = 'application/json'
 
         r.on 'analyses' do
-          r.post 'documents', :document_id do |document_id|
+          analyzer = EDMS::TextAnalyzer.new classifiers: [
+            ['Shanks Enterprises', { vendor_name: 'Shanks' }]
+          ]
+
+          r.post 'documents' do
+            decorator = MayanDecorator.new
+            document = Document.new r.POST.transform_keys(&:to_sym)
+            document = analyzer.call document
+            decorator.decorate document
             response.status = 201
-            { 'message' => "posting #{document_id}", 'result' => [] }.to_json
+            { 'message' => "Classifying document ##{document.id}", 'result' => [] }.to_json
           end
         end
       end

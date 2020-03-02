@@ -3,11 +3,25 @@
 require 'edms/analyzer'
 
 describe EDMS::Analyzer::Web, roda: :app do
-  describe '/analyses/documents/1' do
+  describe '/analyses/documents' do
     before do
-      post '/analyses/documents/1', { 'foo' => 'bar' }
+      allow_any_instance_of(EDMS::MayanDecorator).to receive(:decorate)
     end
 
-    its(:status) { is_expected.to eq(201) }
+    describe 'bad submission' do
+      before do
+        post '/analyses/documents', { 'foo' => 'bar' }
+      end
+
+      its(:status) { is_expected.to eq(400) }
+    end
+
+    describe 'good submission' do
+      before do
+        post '/analyses/documents', { 'id' => 1, 'type' => 1, 'text' => 'foobar' }
+      end
+
+      its(:status) { is_expected.to eq(201) }
+    end
   end
 end

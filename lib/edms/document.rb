@@ -6,7 +6,7 @@ require 'edms'
 module EDMS
   # A simplistic representation of a document.
   class Document < Dry::Struct
-    attribute? :id,       Types::Integer
+    attribute? :id,       Types::ModelKey
     attribute? :type,     Types::Any
     attribute  :text,     Types::String
     attribute  :metadata, Types::MetadataMap

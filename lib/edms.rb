@@ -8,6 +8,7 @@ module EDMS
   module Types
     include Dry.Types()
 
+    ModelKey      = Types::Coercible::Integer
     MetadataKey   = Types::Coercible::String
     MetadataValue = Types::Any
     MetadataMap   = Types::Hash.map(MetadataKey, MetadataValue).default { {} }

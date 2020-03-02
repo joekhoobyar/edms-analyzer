@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'dry-types'
+require 'ice_nine'
+require 'ice_nine/core_ext/object'
 
 # Parent namespace for EDMS analysis logic.
 module EDMS

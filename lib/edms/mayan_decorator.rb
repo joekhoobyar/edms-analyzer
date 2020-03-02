@@ -6,16 +6,16 @@ require 'edms/mayan'
 module EDMS
   # A class that knows how to "decorate" a document in +mayan-edms+.
   class MayanDecorator
-    attr_reader :document_type_id, :connection
+    attr_reader :connection
 
-    DEFAULT_CONNECTION = {
-      url: ENV['MAYAN_EDMS_URL'],
-      user: ENV['MAYAN_EDMS_USER'],
-      password: ENV['MAYAN_EDMS_PASSWORD']
-    }.freeze
+    DEFAULT_CONNECTION = lambda do
+      { url: ENV['MAYAN_EDMS_URL'],
+        user: ENV['MAYAN_EDMS_USER'],
+        password: ENV['MAYAN_EDMS_PASSWORD'] }
+    end
 
-    def initialize(connection: DEFAULT_CONNECTION)
-      @connection = connection
+    def initialize(connection: DEFAULT_CONNECTION.call)
+      @connection = connection.dup.deep_freeze!
     end
 
     # @param document [EDMS::Document]
@@ -24,8 +24,8 @@ module EDMS
     #   the applied metadata
     def decorate(document)
       with_client do |client|
+        mayan_doc = client.document(document.id)
         document.metadata.each do |name, value|
-          mayan_doc = client.document(document.id)
           write_document_metadata mayan_doc, name, value
         end
       end

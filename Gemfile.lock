@@ -197,6 +197,7 @@ DEPENDENCIES
   guard-bundler
   guard-rspec
   guard-rubocop
+  ice_nine
   rake (~> 10.1, < 11.0)
   rerun
   roda

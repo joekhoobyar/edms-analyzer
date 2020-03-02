@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 
 gem 'async-rest'
 gem 'awesome_print'
+gem 'dry-struct',     '~> 1.2', '< 2.0'
+gem 'dry-types',      '~> 1.0', '< 2.0'
 gem 'falcon'
 gem 'rerun'
 gem 'roda'

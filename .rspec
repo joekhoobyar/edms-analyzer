@@ -1,0 +1,6 @@
+-I lib
+-I spec
+--require spec_helper
+--format doc
+--color
+--default-path spec

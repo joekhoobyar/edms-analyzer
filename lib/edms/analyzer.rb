@@ -1,4 +1,10 @@
 # frozen_string_literal: true
 
 require 'edms'
-require 'edms/text_analyzer'
+
+module EDMS
+  # Parent namespace for the analyzer microservice.
+  module Analyzer
+    autoload :Web, 'edms/analyzer/web'
+  end
+end

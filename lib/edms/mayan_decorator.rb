@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'base64'
+require 'edms/mayan'
 
 module EDMS
   # A class that knows how to "decorate" a document in +mayan-edms+.

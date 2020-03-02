@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'edms/classifier'
+
 module EDMS
   # Simple text analyzer that can classify text with an array of Classifier instances,
   # then apply classifications from all applicable Classifier instances, in order.

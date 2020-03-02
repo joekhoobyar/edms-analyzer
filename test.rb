@@ -4,7 +4,8 @@
 require 'json'
 require 'async'
 $LOAD_PATH << 'lib'
-require 'edms/analyzer'
+require 'edms/text_analyzer'
+require 'edms/mayan_decorator'
 
 analyzer = EDMS::TextAnalyzer.new classifiers: [
   ['Shanks Enterprises', { vendor_name: 'Shanks' }]

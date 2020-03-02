@@ -7,7 +7,7 @@ module EDMS
   # then apply classifications from all applicable Classifier instances, in order.
   class TextAnalyzer
     def initialize(classifiers: [])
-      @classifiers = classifiers.map { |a| EDMS::Classifier[*a] }
+      @classifiers = classifiers.map { |a| EDMS::Classifier[a] }
     end
 
     # @param document [EDMS::Document]

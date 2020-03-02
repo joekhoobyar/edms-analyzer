@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'dry-struct'
 require 'roda'
 require 'edms/text_analyzer'
 
@@ -20,7 +21,7 @@ module EDMS
         else
           response.status = 400
         end
-        text
+        { 'message' => text, 'result' => nil }.to_json
       end
 
       route do |r|
@@ -28,7 +29,8 @@ module EDMS
 
         r.on 'analyses' do
           analyzer = EDMS::TextAnalyzer.new classifiers: [
-            ['Shanks Enterprises', { vendor_name: 'Shanks' }]
+            { pattern: 'Shanks Enterprises',
+              action: { vendor_name: 'Shanks' } }
           ]
 
           r.post 'documents' do

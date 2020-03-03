@@ -4,6 +4,7 @@ $LOAD_PATH << 'lib'
 
 require 'rspec/its'
 require 'rspec-roda'
+require 'faker'
 require 'simplecov'
 require 'simplecov-json'
 require 'simplecov-rcov'

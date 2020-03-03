@@ -92,7 +92,7 @@ describe EDMS::MayanDecorator do
       before :each do
         allow(mayan_document).to receive(:document_metadata).and_return(mayan_document_metadata)
         allow(mayan_document).to receive(:document_metadata_map)
-          .and_return({'foo' => mayan_document_metadata})
+          .and_return('foo' => mayan_document_metadata)
       end
 
       it 'loads the document from the backend' do
@@ -123,7 +123,7 @@ describe EDMS::MayanDecorator do
 
       it 'writes the metadata' do
         expect(subject).to receive(:write_document_metadata)
-                             .with(mayan_document, 'bar', 'foo').and_call_original
+          .with(mayan_document, 'bar', 'foo').and_call_original
         expect(mayan_document_metadatas).to receive(:post)
           .with('metadata_type_pk' => 1234, 'value' => 'foo')
         subject.decorate(document)

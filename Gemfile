@@ -12,6 +12,7 @@ gem 'rerun'
 gem 'roda'
 
 group :development do
+  gem 'faker'
   gem 'guard'
   gem 'guard-bundler',      require: false
   gem 'guard-rspec',        require: false

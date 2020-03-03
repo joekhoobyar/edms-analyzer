@@ -16,12 +16,12 @@ module EDMS
 
       plugin :error_handler do |e|
         text = e.message
-        case e
-        when Dry::Struct::Error
-          response.status = :unprocessable_entity
-        else
-          response.status = 400
-        end
+        response.status = case e
+                          when Dry::Struct::Error
+                            :unprocessable_entity
+                          else
+                            400
+                          end
         { 'message' => text, 'result' => nil }
       end
 

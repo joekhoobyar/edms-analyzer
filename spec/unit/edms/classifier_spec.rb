@@ -3,11 +3,11 @@
 require 'edms'
 
 describe EDMS::Classifier do
+  let(:ctor_args) { [] }
+
+  subject { EDMS::Classifier.new(*ctor_args) }
+
   describe '#initialize' do
-    let(:ctor_args) { [] }
-
-    subject { EDMS::Classifier.new(*ctor_args) }
-
     describe 'with text as a pattern' do
       let(:ctor_args) { [{ pattern: Faker::Name.unique.name, action: {} }] }
 
@@ -28,6 +28,20 @@ describe EDMS::Classifier do
       its(:pattern) { should be_a(EDMS::Classifier::DocumentPattern) }
       its('pattern.text') { should eq(/abc/i) }
       its('pattern.metadata') { should eq(foo: /bar/i) }
+    end
+  end
+
+  describe '#call' do
+    describe 'with replacements in the action' do
+      let :ctor_args do
+        [{ pattern: %r{date (\d{1,2})/(\d{1,2})/(\d{4})},
+           action: { 'bill_date' => '\1/\2/\3' } }]
+      end
+
+      it 'assigns replaced values in the metadata' do
+        document = EDMS::Document.new text: 'bill date 1/3/2021'
+        expect(subject.call(document)).to eq(document.with_metadata('bill_date' => '1/3/2021'))
+      end
     end
   end
 

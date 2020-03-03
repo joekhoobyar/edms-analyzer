@@ -18,7 +18,7 @@ module EDMS
 
       def match?(document)
         metadata.all? { |key, pattern| document.metadata[key].to_s =~ pattern } &&
-          (text.nil? || document.text =~ text)
+          (text.nil? || document.text.match(text))
       end
     end
 
@@ -38,8 +38,11 @@ module EDMS
     def initialize(pattern:, action:)
       pattern = { text: pattern } unless pattern.is_a? Hash
       @pattern = DocumentPattern.new(**pattern)
-      @action = action
-      @action = ->(data) { data.with_metadata(action) } if action.is_a? Hash
+      @action = if action.is_a? Hash
+                  ->(doc, match) { doc.with_metadata(with_replacements(action, match)) }
+                else
+                  action
+                end
     end
 
     # @param document [EDMS::Document]
@@ -47,11 +50,21 @@ module EDMS
     # @return [EDMS::Document]
     #   either a newly classified document, or the original document
     def call(document)
-      if pattern.match? document
-        @action.call(document)
+      matchdata = pattern.match?(document)
+      if matchdata
+        @action.call(document, matchdata)
       else
         document
       end
+    end
+
+    private
+
+    def with_replacements(metadata, matchdata = $LAST_MATCH_INFO)
+      captures = Array(matchdata&.captures).inject({}) { |h, c| h.update("\\#{h.size + 1}" => c) }
+      Hash[metadata.map do |key, value|
+        [key, value.is_a?(String) ? value.gsub(/\\\d{1}/, captures) : value]
+      end]
     end
   end
 end

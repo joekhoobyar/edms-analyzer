@@ -32,10 +32,10 @@ module EDMS
       end
 
       def document_type
-        endpoint = Async::HTTP::Endpoint.parse(result[:document_type][:url])
+        endpoint = Async::HTTP::Endpoint.parse(value[:document_type][:url])
         DocumentType.new @resource.with(path: endpoint.path),
                          metadata: metadata,
-                         value: result[:document_type]
+                         value: value[:document_type]
       end
 
       def document_metadata_map

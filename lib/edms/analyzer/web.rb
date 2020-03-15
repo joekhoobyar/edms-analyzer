@@ -42,8 +42,10 @@ module EDMS
 
           r.post 'documents' do
             decorator = MayanDecorator.new
+
             document = Document.new r.POST.transform_keys(&:to_sym)
             document = analyzer.call document
+
             decorator.decorate document
             response.status = 201
             { 'message' => "Classifying document ##{document.id}", 'result' => [] }

@@ -46,7 +46,7 @@ module EDMS
         raise Async::REST::ResponseError, response unless response.success?
 
       else
-        raise ArgumentError, "no such metadata named '#{metadata_name}'"
+        raise ArgumentError, "no such metadata key: #{metadata_name}"
       end
 
       response.close

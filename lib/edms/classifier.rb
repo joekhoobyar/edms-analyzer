@@ -37,7 +37,7 @@ module EDMS
 
     def initialize(pattern:, action:)
       pattern = { text: pattern } unless pattern.is_a? Hash
-      @pattern = DocumentPattern.new(**pattern)
+      @pattern = DocumentPattern.new(**pattern.transform_keys(&:to_sym))
       @action = if action.is_a? Hash
                   ->(doc, match) { doc.with_metadata(with_replacements(action, match)) }
                 else

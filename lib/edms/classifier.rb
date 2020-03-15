@@ -24,18 +24,41 @@ module EDMS
 
     # Can modify pattern matched capture data.
     class CaptureModifier < Dry::Struct
-      attribute :ids, Types.Array(Types::Coercible::Integer)
-      attribute :type, Types::Coercible::Symbol.enum(:sprintf)
-      attribute :args, Types.Array(Types::Any).default(EMPTY_ARRAY)
+      attribute  :type, Types::Coercible::Symbol.enum(:sprintf, :month_start, :month_end, :tax_year)
+      attribute  :args, Types.Array(Types::Any).default(EMPTY_ARRAY)
+      attribute  :from, Types::Integer | Types::String
+      attribute? :to, Types::Integer
 
-      def call(value)
-        send :"transform_#{type}", value
+      def call(captures)
+        case from
+        when Integer
+          value = send :"transform_#{type}", captures["\\#{from}"]
+          captures["\\#{from || to}"] = value
+        when String
+          value = send :"transform_#{type}", from.gsub(/\\\d{1}/, captures)
+          captures["\\#{to}"] = value
+        end
       end
 
       private
 
       def transform_sprintf(value)
         args[0] % [value]
+      end
+
+      def transform_tax_year(value)
+        d = (Date.parse(value) << -1)
+        Date.new(d.year, d.month, 1).year.to_s
+      end
+
+      def transform_month_end(value)
+        d = (Date.parse(value) << -1)
+        (Date.new(d.year, d.month, 1) - 1).strftime(args[0] || '%Y-%m-%d')
+      end
+
+      def transform_month_start(value)
+        d = Date.parse(value)
+        Date.new(d.year, d.month, 1).strftime(args[0] || '%Y-%m-%d')
       end
     end
 
@@ -80,10 +103,10 @@ module EDMS
 
     def with_replacements(metadata, matchdata = $LAST_MATCH_INFO)
       captures = Array(matchdata&.captures).inject({}) do |h, c|
-        id = h.size + 1
-        c = modifiers.inject(c) { |v,m| m.ids.include?(id) ? m.call(v) : v }
-        h.update("\\#{id}" => c)
+        h.update("\\#{h.size + 1}" => c)
       end
+
+      modifiers.each { |modifier| modifier.call(captures) }
 
       Hash[metadata.map do |key, value|
         [key, value.is_a?(String) ? value.gsub(/\\\d{1}/, captures) : value]

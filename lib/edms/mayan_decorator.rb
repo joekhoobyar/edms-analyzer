@@ -28,13 +28,34 @@ module EDMS
         document.metadata.each do |name, value|
           write_document_metadata mayan_doc, name, value
         end
+
+        filename = document.metadata['suggested_filename']
+        write_document_label mayan_doc, filename if filename
+
+        doctype = document.metadata['suggested_doctype']
+        write_document_type mayan_doc, doctype if doctype
       end
     end
 
     protected
 
+    def write_document_label(mayan_doc, filename)
+      puts "Writing document ##{mayan_doc.value[:id]} => label ##{filename}"
+      response = mayan_doc.patch('label' => filename)
+      raise Async::REST::ResponseError, response unless response.success?
+      response.close
+    end
+
+    def write_document_type(mayan_doc, doctype)
+      puts "Writing document ##{mayan_doc.value[:id]} => type ##{doctype}"
+      response = mayan_doc.with(path: 'type/change/').post('new_document_type' => doctype)
+      raise Async::REST::ResponseError, response unless response.success?
+      response.close
+    end
+
     def write_document_metadata(mayan_doc, metadata_name, metadata_value)
       metadata_name = metadata_name.to_s
+      puts "Writing document ##{mayan_doc.value[:id]} metadata #{metadata_name} => #{metadata_value}"
 
       if (metadata = mayan_doc.document_metadata_map[metadata_name])
         response = metadata.patch('value' => metadata_value)

@@ -17,7 +17,7 @@ group :development do
   gem 'guard-bundler',      require: false
   gem 'guard-rspec',        require: false
   gem 'guard-rubocop',      require: false
-  gem 'rake',               '~> 10.1', '< 11.0'
+  gem 'rake',               ">= 12.3.3", '< 13'
   gem 'rspec',              '~> 3.4', '< 4.0',   require: false
   gem 'rspec-core',         '>= 3.9.0', '< 4.0', require: false
   gem 'rspec-expectations', '>= 3.9.0', '< 4.0', require: false

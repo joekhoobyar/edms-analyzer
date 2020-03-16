@@ -26,13 +26,14 @@ module EDMS
       with_client do |client|
         mayan_doc = client.document(document.id)
         document.metadata.each do |name, value|
+          next unless name =~ /^[A-Za-z0-9]/
           write_document_metadata mayan_doc, name, value
         end
 
-        filename = document.metadata['suggested_filename']
+        filename = document.metadata['_suggested_filename']
         write_document_label mayan_doc, filename if filename
 
-        doctype = document.metadata['suggested_doctype']
+        doctype = document.metadata['_suggested_doctype']
         write_document_type mayan_doc, doctype if doctype
       end
     end
@@ -88,6 +89,7 @@ module EDMS
       headers = Protocol::HTTP::Headers.new
       userpass = "#{connection[:user]}:#{connection[:password]}"
       headers['Authorization'] = "Basic #{Base64.encode64(userpass).chomp}"
+      headers['Content-type'] = 'application/json'
       headers
     end
   end

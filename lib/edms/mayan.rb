@@ -8,6 +8,43 @@ module EDMS
   module Mayan
     # Base class for all REST representations in +mayan-edms+.
     class Representation < Async::REST::Representation
+      def related(klass, url)
+        endpoint = Async::HTTP::Endpoint.parse(url)
+        klass.new @resource.with(path: endpoint.path), metadata: metadata
+      end
+
+      def subresource(klass, attributes, url_key = :url)
+        endpoint = Async::HTTP::Endpoint.parse(attributes[url_key])
+        klass.new @resource.with(path: endpoint.path), metadata: metadata, value: attributes
+      end
+    end
+
+    # Base class for a "paginated list" in +mayan-edms+.
+    class Paginated < Representation
+      include Enumerable
+
+      def each(**parameters)
+        return to_enum(:each, **parameters) unless block_given?
+
+        pager = @resource.with(**parameters)
+        while true
+          page = pager.get(self.class)
+          break if page.value[:count] == 0
+
+          Array(page.value[:results]).each do |item|
+            yield page.subresource(representation, item)
+          end
+
+          break # if page.value[:next].nil?
+
+          endpoint = Async::HTTP::Endpoint.parse(page.value[:next])
+          pager = pager.with(path: endpoint.path)
+        end
+      end
+
+      def empty?
+        self.value[:count] == 0
+      end
     end
 
     # Main "client" class for REST representations in +mayan-edms+.
@@ -31,11 +68,12 @@ module EDMS
         end
       end
 
+      def latest_version
+        subresource DocumentVersion, value[:latest_version]
+      end
+
       def document_type
-        endpoint = Async::HTTP::Endpoint.parse(value[:document_type][:url])
-        DocumentType.new @resource.with(path: endpoint.path),
-                         metadata: metadata,
-                         value: value[:document_type]
+        subresource DocumentType, value[:document_type]
       end
 
       def document_metadata_map
@@ -44,6 +82,35 @@ module EDMS
 
       def document_metadata_map!(from = document_metadata)
         Hash[from.results.map { |r| [r.value[:metadata_type][:name], r] }]
+      end
+    end
+
+    # Represents a "document version" in +mayan-edms+.
+    class DocumentVersion < Representation
+      def pages
+        related DocumentPages, value[:pages_url]
+      end
+
+      def ocr_content
+        pages.map(&:ocr_content).join("\n")
+      end
+    end
+
+    # Represents "document pages" in +mayan-edms+.
+    class DocumentPages < Paginated
+      def representation
+        DocumentPage
+      end
+    end
+
+    # Represents a "document page" in +mayan-edms+.
+    class DocumentPage < Representation
+      def ocr
+        with Representation, path: 'ocr/'
+      end
+
+      def ocr_content
+        ocr.value[:content]
       end
     end
 

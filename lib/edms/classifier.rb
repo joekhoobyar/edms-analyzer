@@ -24,12 +24,13 @@ module EDMS
 
     # Can modify pattern matched capture data.
     class CaptureModifier < Dry::Struct
-      attribute  :type, Types::Coercible::Symbol.enum(:sprintf, :month_start, :month_end, :tax_year)
+      attribute  :type, Types::Coercible::Symbol.enum(:metadata, :sprintf, :tax_year,
+                                                      :month_start, :month_end)
       attribute  :args, Types.Array(Types::Any).default(EMPTY_ARRAY)
-      attribute  :from, Types::Integer | Types::String
+      attribute? :from, Types::Integer | Types::String
       attribute? :to, Types::Integer
 
-      def call(captures)
+      def call(captures, metadata={})
         case from
         when Integer
           value = send :"transform_#{type}", captures["\\#{from}"]
@@ -37,10 +38,17 @@ module EDMS
         when String
           value = send :"transform_#{type}", from.gsub(/\\\d{1}/, captures)
           captures["\\#{to}"] = value
+        when NilClass
+          value = send :"transform_#{type}", metadata
+          captures["\\#{to}"] = value
         end
       end
 
       private
+
+      def transform_metadata(metadata)
+        metadata[args.first]
+      end
 
       def transform_sprintf(value)
         args[0] % [value]
@@ -80,7 +88,7 @@ module EDMS
       @pattern = DocumentPattern.new(**pattern.transform_keys(&:to_sym))
       @modifiers = modifiers.map { |mod| CaptureModifier.new(mod.to_h.transform_keys(&:to_sym)) }
       @action = if action.is_a? Hash
-                  ->(doc, match) { doc.with_metadata(with_replacements(action, match)) }
+                  ->(doc, match) { doc.with_metadata(with_replacements(doc, action, match)) }
                 else
                   action
                 end
@@ -101,12 +109,12 @@ module EDMS
 
     private
 
-    def with_replacements(metadata, matchdata = $LAST_MATCH_INFO)
+    def with_replacements(doc, metadata, matchdata = $LAST_MATCH_INFO)
       captures = Array(matchdata&.captures).inject({}) do |h, c|
         h.update("\\#{h.size + 1}" => c)
       end
 
-      modifiers.each { |modifier| modifier.call(captures) }
+      modifiers.each { |modifier| modifier.call(captures, doc.metadata) }
 
       Hash[metadata.map do |key, value|
         [key, value.is_a?(String) ? value.gsub(/\\\d{1}/, captures) : value]

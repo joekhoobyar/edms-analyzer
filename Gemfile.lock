@@ -131,7 +131,7 @@ GEM
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rainbow (3.0.0)
-    rake (10.5.0)
+    rake (12.3.3)
     rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
@@ -203,7 +203,7 @@ DEPENDENCIES
   guard-rspec
   guard-rubocop
   ice_nine
-  rake (~> 10.1, < 11.0)
+  rake (>= 12.3.3, < 13)
   rerun
   roda
   rspec (~> 3.4, < 4.0)

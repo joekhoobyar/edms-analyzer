@@ -44,14 +44,16 @@ module EDMS
       puts "Writing document ##{mayan_doc.value[:id]} => label ##{filename}"
       response = mayan_doc.patch('label' => filename)
       raise Async::REST::ResponseError, response unless response.success?
-      response.close
+    ensure
+      response.close if response
     end
 
     def write_document_type(mayan_doc, doctype)
       puts "Writing document ##{mayan_doc.value[:id]} => type ##{doctype}"
       response = mayan_doc.with(path: 'type/change/').post('new_document_type' => doctype)
       raise Async::REST::ResponseError, response unless response.success?
-      response.close
+    ensure
+      response.close if response
     end
 
     def write_document_metadata(mayan_doc, metadata_name, metadata_value)
@@ -71,7 +73,8 @@ module EDMS
         raise ArgumentError, "no such metadata key: #{metadata_name}"
       end
 
-      response.close
+    ensure
+      response.close if response
     end
 
     private

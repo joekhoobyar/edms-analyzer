@@ -35,7 +35,7 @@ module EDMS
             yield page.subresource(representation, item)
           end
 
-          break if page.value[:next].nil?
+          break # if page.value[:next].nil?
 
           endpoint = Async::HTTP::Endpoint.parse(page.value[:next])
           pager = pager.with(path: endpoint.path)

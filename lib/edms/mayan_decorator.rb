@@ -88,6 +88,7 @@ module EDMS
       headers = Protocol::HTTP::Headers.new
       userpass = "#{connection[:user]}:#{connection[:password]}"
       headers['Authorization'] = "Basic #{Base64.encode64(userpass).chomp}"
+      headers['Content-type'] = 'application/json'
       headers
     end
   end

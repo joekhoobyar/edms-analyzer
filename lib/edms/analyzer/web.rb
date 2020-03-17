@@ -21,16 +21,16 @@ module EDMS
       plugin :json_parser
       plugin :symbol_status
 
-      # plugin :error_handler do |e|
-      #   text = e.message
-      #   response.status = case e
-      #                     when Dry::Struct::Error
-      #                       :unprocessable_entity
-      #                     else
-      #                       400
-      #                     end
-      #   { 'message' => text, 'result' => nil }
-      # end
+      plugin :error_handler do |e|
+        text = e.message
+        response.status = case e
+                          when Dry::Struct::Error
+                            :unprocessable_entity
+                          else
+                            400
+                          end
+        { 'message' => text, 'result' => nil }
+      end
 
       route do |r|
         response['Content-Type'] = 'application/json'

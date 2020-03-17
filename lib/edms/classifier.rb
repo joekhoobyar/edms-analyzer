@@ -24,8 +24,8 @@ module EDMS
 
     # Can modify pattern matched capture data.
     class CaptureModifier < Dry::Struct
-      attribute  :type, Types::Coercible::Symbol.enum(:metadata, :sprintf, :tax_year,
-                                                      :month_start, :month_end)
+      attribute  :type, Types::Coercible::Symbol.enum(:metadata, :sprintf, :tax_year, :next_day,
+                                                      :month_number, :month_start, :month_end)
       attribute  :args, Types.Array(Types::Any).default(EMPTY_ARRAY)
       attribute? :from, Types::Integer | Types::String
       attribute? :to, Types::Integer
@@ -58,6 +58,16 @@ module EDMS
       def transform_tax_year(value)
         d = (Date.parse(value) << -1)
         Date.new(d.year, d.month, 1).year.to_s
+      end
+
+      def transform_month_number(value)
+        name = value.to_s.capitalize
+        number = Date::MONTHNAMES.index(name) || Date::ABBR_MONTHNAMES.index(name)
+        '%02d' % [number + 1] if number
+      end
+
+      def transform_next_day(value)
+        (Date.parse(value) + 1).strftime(args[0] || '%Y-%m-%d')
       end
 
       def transform_month_end(value)

@@ -51,6 +51,7 @@ module EDMS
       end
 
       def transform_sprintf(value)
+        value.sub!(/^0+([1-9])/, '\1') if value.is_a? String
         args[0] % [value]
       end
 

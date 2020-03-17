@@ -32,13 +32,10 @@ module EDMS
         { 'message' => text, 'result' => nil }
       end
 
+      plugin :heartbeat
+
       route do |r|
         response['Content-Type'] = 'application/json'
-
-        r.on 'health' do
-          r.on('live') { { message: 'OK' } }
-          r.on('ready') { { message: 'OK' } }
-        end
 
         r.on 'analyses' do
           config = load_config

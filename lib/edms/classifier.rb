@@ -35,7 +35,7 @@ module EDMS
         case from
         when Integer
           value = send :"transform_#{type}", captures["\\#{from}"]
-          captures["\\#{from || to}"] = value
+          captures["\\#{to || from}"] = value
         when String
           value = send :"transform_#{type}", from.gsub(/\\\d{1}/, captures)
           captures["\\#{to}"] = value

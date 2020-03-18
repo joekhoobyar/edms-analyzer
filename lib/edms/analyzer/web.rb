@@ -32,6 +32,8 @@ module EDMS
         { 'message' => text, 'result' => nil }
       end
 
+      plugin :heartbeat
+
       route do |r|
         response['Content-Type'] = 'application/json'
 

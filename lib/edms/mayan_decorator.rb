@@ -14,6 +14,10 @@ module EDMS
         password: ENV['MAYAN_EDMS_PASSWORD'] }
     end
 
+    def logger
+      Async.logger
+    end
+
     def initialize(connection: DEFAULT_CONNECTION.call)
       @connection = connection.dup.deep_freeze!
     end
@@ -41,7 +45,7 @@ module EDMS
     protected
 
     def write_document_label(mayan_doc, filename)
-      puts "Writing document ##{mayan_doc.value[:id]} => label ##{filename}"
+      logger.info "Writing document ##{mayan_doc.value[:id]} => label ##{filename}"
       response = mayan_doc.patch('label' => filename)
       raise Async::REST::ResponseError, response unless response.success?
     ensure
@@ -49,7 +53,7 @@ module EDMS
     end
 
     def write_document_type(mayan_doc, doctype)
-      puts "Writing document ##{mayan_doc.value[:id]} => type ##{doctype}"
+      logger.info "Writing document ##{mayan_doc.value[:id]} => type ##{doctype}"
       response = mayan_doc.with(path: 'type/change/').post('new_document_type' => doctype)
       raise Async::REST::ResponseError, response unless response.success?
     ensure
@@ -58,7 +62,7 @@ module EDMS
 
     def write_document_metadata(mayan_doc, metadata_name, metadata_value)
       metadata_name = metadata_name.to_s
-      puts "Writing document ##{mayan_doc.value[:id]} metadata #{metadata_name} => #{metadata_value}"
+      logger.info "Writing document ##{mayan_doc.value[:id]} metadata #{metadata_name} => #{metadata_value}"
 
       if (metadata = mayan_doc.document_metadata_map[metadata_name])
         response = metadata.patch('value' => metadata_value)

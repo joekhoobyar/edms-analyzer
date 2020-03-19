@@ -50,6 +50,7 @@ describe EDMS::MayanDecorator do
 
   describe '#decorate(document)' do
     let(:client) { instance_double('EDMS::Mayan::Client') }
+    let(:logger) { instance_double('Console::Logger') }
     let(:mayan_document) { instance_double('EDMS::Mayan::Document') }
     let(:mayan_document_type) { instance_double('EDMS::Mayan::DocumentType') }
     let(:mayan_document_metadata) { instance_double('EDMS::Mayan::DocumentMetadata') }
@@ -57,12 +58,20 @@ describe EDMS::MayanDecorator do
 
     before :each do
       allow(subject).to receive(:with_client).and_yield(client)
+      allow(subject).to receive(:logger).and_return(logger)
+
       allow(client).to receive(:document).and_return(mayan_document)
+
+      allow(logger).to receive_messages(info: nil, debug: nil, warn: nil, error: nil)
+
       allow(mayan_document_type).to receive(:metadata_type_map)
         .and_return('bar' => 1234)
+
+      allow(mayan_document).to receive(:value).and_return({id: 1})
       allow(mayan_document).to receive(:document_metadata).and_return(mayan_document_metadatas)
       allow(mayan_document).to receive(:document_type).and_return(mayan_document_type)
       allow(mayan_document).to receive(:document_metadata_map).and_return({})
+
       allow(mayan_document_metadata).to receive(:patch)
         .and_return(double('response', success?: true, close: nil))
       allow(mayan_document_metadatas).to receive(:post)

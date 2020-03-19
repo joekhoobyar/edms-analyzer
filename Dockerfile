@@ -35,8 +35,16 @@ RUN bundle config --global path $(ruby -e 'puts Gem.user_dir') \
 
 # Microservice installation.
 RUN mkdir /home/svc/edms-analyzer
-COPY config.ru Gemfile Gemfile.lock LICENSE README.md /home/svc/edms-analyzer/
+COPY Gemfile.release /home/svc/edms-analyzer/Gemfile
 COPY lib/ /home/svc/edms-analyzer/lib/
+COPY config.ru Gemfile.lock LICENSE README.md /home/svc/edms-analyzer/
+
+# Fix permissions
+USER root
+RUN chown -R svc:svc /home/svc
+
+# Create the bundle
+USER svc
 WORKDIR /home/svc/edms-analyzer
 RUN bundle package
 
@@ -44,10 +52,9 @@ RUN bundle package
 USER root
 RUN apk --purge del .build-deps \
     && rm -f /var/cache/apk/* \
-    && chown -R svc:svc /home/svc
 
+# Final settings
 USER svc
-
 ENV HOME=/home/svc
 ENV PATH="$HOME/.gem/ruby/2.6.0/bin:$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 

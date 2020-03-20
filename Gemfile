@@ -11,6 +11,14 @@ gem 'roda'
 
 group :development do
   gem 'awesome_print'
+
+  # gem 'build-harness', path: '../../build-harness/build-harness'
+  # gem 'build-harness-config', path: '../../build-harness/build-harness-config'
+  # gem 'build-harness-machines', path: '../../build-harness/build-harness-machines'
+  gem 'build-harness', '~> 0.4', '< 1.0'
+  gem 'build-harness-config'
+  gem 'build-harness-machines'
+
   gem 'faker'
   gem 'guard'
   gem 'guard-bundler',      require: false

@@ -3,21 +3,21 @@
 source 'https://rubygems.org'
 
 gem 'async-rest'
-gem 'awesome_print'
 gem 'dry-struct',     '~> 1.2', '< 2.0'
 gem 'dry-types',      '~> 1.0', '< 2.0'
 gem 'falcon'
 gem 'ice_nine'
-gem 'rerun'
 gem 'roda'
 
 group :development do
+  gem 'awesome_print'
   gem 'faker'
   gem 'guard'
   gem 'guard-bundler',      require: false
   gem 'guard-rspec',        require: false
   gem 'guard-rubocop',      require: false
   gem 'rake',               ">= 12.3.3", '< 13'
+  gem 'rerun'
   gem 'rspec',              '~> 3.4', '< 4.0',   require: false
   gem 'rspec-core',         '>= 3.9.0', '< 4.0', require: false
   gem 'rspec-expectations', '>= 3.9.0', '< 4.0', require: false

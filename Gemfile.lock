@@ -190,7 +190,7 @@ GEM
     azure_mgmt_resources (0.17.8)
       ms_rest_azure (~> 0.11.1)
     build-environment (1.13.0)
-    build-harness (0.4.10)
+    build-harness (0.4.11)
       activemodel (~> 6.0)
       activesupport (~> 6.0)
       bump (~> 0.8)

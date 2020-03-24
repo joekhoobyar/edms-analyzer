@@ -10,6 +10,8 @@ module EDMS
   module Analyzer
     # REST microservice entry point
     class Web < Roda
+      include RackEnv
+
       CONFIG_FILE = File.expand_path('../../../config.yml', __dir__)
 
       def load_config
@@ -37,18 +39,23 @@ module EDMS
       route do |r|
         response['Content-Type'] = 'application/json'
 
+        logger = Async.logger
+
         r.on 'analyses' do
           config = load_config
 
           analyzer = EDMS::TextAnalyzer.new(**config['edms']['text_analyzer'].transform_keys(&:to_sym))
 
           r.post 'documents' do
-            decorator = MayanDecorator.new
-
             document = Document.new r.POST.transform_keys(&:to_sym)
             document = analyzer.call document
+            logger.info "Queuing document ##{document.id} for classification"
 
-            decorator.decorate document
+            Async do
+              MayanDecorator.new.decorate document
+              logger.info "Classified document ##{document.id}"
+            end
+
             response.status = 201
             { 'message' => "Classifying document ##{document.id}", 'result' => [] }
           end

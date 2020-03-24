@@ -9,14 +9,17 @@ require 'securerandom'
 require 'async'
 
 class InternalLogger
+  include EDMS::Analyzer::RackEnv
+
   def initialize(app)
     @app = app
   end
 
   def call(env)
-    logger = Async.logger.with(level: :info, name: "[web] #{SecureRandom.base64(9)}")
+    env[ASYNC_LOGGER_TOPIC] ||= SecureRandom.base64(9)
+    env[ASYNC_LOGGER] = Async.logger.with(level: :info, name: "[web] #{env[ASYNC_LOGGER_TOPIC]}")
 
-    Async(logger: logger) do
+    Async(logger: env[ASYNC_LOGGER]) do
       @app.call(env)
     end.wait
   end

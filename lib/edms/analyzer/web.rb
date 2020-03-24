@@ -48,7 +48,7 @@ module EDMS
             document = Document.new r.POST.transform_keys(&:to_sym)
             document = analyzer.call document
 
-            decorator.decorate document
+            Async { decorator.decorate document }
             response.status = 201
             { 'message' => "Classifying document ##{document.id}", 'result' => [] }
           end

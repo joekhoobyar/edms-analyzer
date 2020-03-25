@@ -67,7 +67,7 @@ module EDMS
       end
 
       def transform_month_number(value)
-        name = value.to_s.capitalize
+        name = value.to_s.delete(' ').capitalize
         number = Date::MONTHNAMES.index(name) || Date::ABBR_MONTHNAMES.index(name)
         '%02d' % [number] if number
       end

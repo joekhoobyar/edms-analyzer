@@ -35,16 +35,20 @@ module EDMS
             yield page.subresource(representation, item)
           end
 
-          break # if page.value[:next].nil?
+          break if page.value[:next].nil?
 
           endpoint = Async::HTTP::Endpoint.parse(page.value[:next])
-          pager = pager.with(path: endpoint.path)
+          pager = pager.class.new(pager.delegate,
+                                  ::Protocol::HTTP::Reference.parse(endpoint.path),
+                                  pager.headers.dup)
         end
       end
 
       def empty?
-        self.value[:count] == 0
+        value[:count] == 0
       end
+
+      alias all to_a
     end
 
     # Main "client" class for REST representations in +mayan-edms+.
@@ -81,7 +85,7 @@ module EDMS
       end
 
       def document_metadata_map!(from = document_metadata)
-        Hash[from.results.map { |r| [r.value[:metadata_type][:name], r] }]
+        Hash[from.all.map { |r| [r.value[:metadata_type][:name], r] }]
       end
     end
 
@@ -114,20 +118,15 @@ module EDMS
       end
     end
 
-    # Represents "document metadata" in +mayan-edms+.
-    class DocumentMetadata < Representation
+    # Represents a list of "document metadata" in +mayan-edms+.
+    class DocumentMetadatas < Paginated
+      def representation
+        DocumentMetadata
+      end
     end
 
-    # Represents a list of "document metadata" in +mayan-edms+.
-    class DocumentMetadatas < Representation
-      def results
-        value[:results].map do |result|
-          endpoint = Async::HTTP::Endpoint.parse(result[:url])
-          DocumentMetadata.new @resource.with(path: endpoint.path),
-                               metadata: metadata,
-                               value: result
-        end
-      end
+    # Represents "document metadata" in +mayan-edms+.
+    class DocumentMetadata < Representation
     end
 
     # Represents a "document type" in +mayan-edms+.
@@ -141,15 +140,19 @@ module EDMS
       end
 
       def metadata_type_map!(from = metadata_types)
-        Hash[from.results.map { |r| r[:metadata_type].values_at(:name, :id) }]
+        Hash[from.all.map { |r| r.value[:metadata_type].values_at(:name, :id) }]
       end
     end
 
     # Represents a list "metadata types" associated with "document types" in +mayan-edms+.
-    class DocumentTypeMetadataTypes < Representation
-      def results
-        value[:results]
+    class DocumentTypeMetadataTypes < Paginated # Representation
+      def representation
+        DocumentTypeMetadataType
       end
+    end
+
+    # Represents a list "metadata types" associated with "document types" in +mayan-edms+.
+    class DocumentTypeMetadataType < Representation
     end
   end
 end

@@ -140,7 +140,7 @@ module EDMS
       end
 
       def metadata_type_map!(from = metadata_types)
-        Hash[from.results.map { |r| r[:metadata_type].values_at(:name, :id) }]
+        Hash[from.all.map { |r| r.value[:metadata_type].values_at(:name, :id) }]
       end
     end
 

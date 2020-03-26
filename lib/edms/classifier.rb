@@ -73,11 +73,15 @@ module EDMS
       end
 
       def transform_prev_day(value)
-        (Date.parse(value) - 1).strftime(args[0] || '%Y-%m-%d')
+        value, days = value.split('|', 2).reverse
+        days = days.nil? ? 1 : days.to_i
+        (Date.parse(value) - days).strftime(args[0] || '%Y-%m-%d')
       end
 
       def transform_next_day(value)
-        (Date.parse(value) + 1).strftime(args[0] || '%Y-%m-%d')
+        value, days = value.split('|', 2).reverse
+        days = days.nil? ? 1 : days.to_i
+        (Date.parse(value) + days).strftime(args[0] || '%Y-%m-%d')
       end
 
       def transform_month_end(value)

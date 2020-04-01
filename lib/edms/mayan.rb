@@ -53,12 +53,30 @@ module EDMS
 
     # Main "client" class for REST representations in +mayan-edms+.
     class Client < Representation
+      def cabinet(id)
+        with Cabinet, path: "cabinets/#{id}/"
+      end
+
       def document(id)
         with Document, path: "documents/#{id}/"
       end
 
       def document_type(id)
         with DocumentType, path: "document_types/#{id}/"
+      end
+    end
+
+    # Represents a "cabinet" in +mayan-edms+.
+    class Cabinet < Representation
+      def documents
+        with Documents, path: 'documents/'
+      end
+    end
+
+    # Represents "document pages" in +mayan-edms+.
+    class Documents < Paginated
+      def representation
+        Document
       end
     end
 
@@ -70,6 +88,10 @@ module EDMS
         else
           with DocumentMetadata, path: "metadata/#{id}/"
         end
+      end
+
+      def tags
+        with Tags, path: 'tags/'
       end
 
       def latest_version
@@ -98,6 +120,17 @@ module EDMS
       def ocr_content
         pages.map(&:ocr_content).join("\n")
       end
+    end
+
+    # Represents "tags" in +mayan-edms+.
+    class Tags < Paginated
+      def representation
+        Tag
+      end
+    end
+
+    # Represents a "tag" in +mayan-edms+.
+    class Tag < Representation
     end
 
     # Represents "document pages" in +mayan-edms+.

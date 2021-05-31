@@ -135,9 +135,15 @@ module EDMS
     private
 
     def with_replacements(doc, metadata, matchdata = $LAST_MATCH_INFO)
-      captures = Array(matchdata&.captures).inject({}) do |h, c|
-        h.update("\\#{h.size + 1}" => c)
-      end
+      captures = 
+        case matchdata
+        when TrueClass, FalseClass, NilClass
+          {}
+        else
+          Array(matchdata&.captures).inject({}) do |h, c|
+            h.update("\\#{h.size + 1}" => c)
+          end
+        end
 
       modifiers.each { |modifier| modifier.call(captures, doc.metadata) }
 

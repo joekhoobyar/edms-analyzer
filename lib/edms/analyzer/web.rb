@@ -31,7 +31,7 @@ module EDMS
                           else
                             400
                           end
-        { 'message' => text, 'result' => nil }
+        { 'message' => text, 'result' => nil, 'backtrace' => e.backtrace.join("\n") }
       end
 
       plugin :heartbeat

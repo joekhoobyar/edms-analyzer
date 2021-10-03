@@ -26,7 +26,8 @@ module EDMS
     class CaptureModifier < Dry::Struct
       attribute  :type, Types::Coercible::Symbol.enum(:metadata, :sprintf, :tax_year, :currency,
                                                       :prev_day, :next_day,
-                                                      :month_number, :month_start, :month_end)
+                                                      :month_number, :month_start, :month_end,
+                                                      :prev_month, :next_month)
       attribute  :args, Types.Array(Types::Any).default(EMPTY_ARRAY)
       attribute? :from, Types::Integer | Types::String
       attribute? :to, Types::Integer
@@ -82,6 +83,18 @@ module EDMS
         value, days = value.split('|', 2).reverse
         days = days.nil? ? 1 : days.to_i
         (Date.parse(value) + days).strftime(args[0] || '%Y-%m-%d')
+      end
+
+      def transform_prev_month(value)
+        value, months = value.split('|', 2).reverse
+        months = months.nil? ? 1 : months.to_i
+        (Date.parse(value) << months).strftime(args[0] || '%Y-%m-%d')
+      end
+
+      def transform_next_month(value)
+        value, months = value.split('|', 2).reverse
+        months = months.nil? ? 1 : months.to_i
+        (Date.parse(value) >> months).strftime(args[0] || '%Y-%m-%d')
       end
 
       def transform_month_end(value)

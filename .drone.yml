@@ -11,7 +11,7 @@ steps:
     image: alpine
     commands:
       - apk add git
-      - echo -n "$(date +%Y%m%d),$(git rev-parse --short HEAD),$(git rev-parse HEAD)" >>.tags
+      - echo -n ",$(date +%Y%m%d),$(git rev-parse --short HEAD),$(git rev-parse HEAD)" >>.tags
   - name: image local
     image: plugins/docker
     settings:

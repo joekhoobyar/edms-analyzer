@@ -10,6 +10,7 @@ steps:
   - name: set tags
     image: alpine
     commands:
+      - apk add git
       - date +%Y%m%d >>.tags
       - git rev-parse --short HEAD >>.tags
       - git rev-parse HEAD >>.tags

@@ -1,0 +1,58 @@
+---
+kind: pipeline
+type: kubernetes
+name: edms-analyzer/docker
+
+clone:
+  skip_verify: true
+
+steps:
+  - name: set tags
+    image: alpine
+    commands:
+      - date +%Y%m%d >>.tags
+      - git rev-parse --short HEAD >>.tags
+      - git rev-parse HEAD >>.tags
+  - name: image local
+    image: plugins/docker
+    settings:
+      registry: dockerregistry.lab.khoobyar.lan
+      repo: dockerregistry.lab.khoobyar.lan/joekhoobyar/edms-analyzer
+      insecure: true
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+  - name: image dockerhub
+    image: plugins/docker
+    settings:
+      repo: joekhoobyar/edms-analyzer
+      insecure: true
+      username:
+        from_secret: dockerhub_username
+      password:
+        from_secret: dockerhub_password
+---
+kind: secret
+name: docker_username
+get:
+  path: docker-registry-admin
+  name: username
+---
+kind: secret
+name: docker_password
+get:
+  path: docker-registry-admin
+  name: password
+---
+kind: secret
+name: dockerhub_username
+get:
+  path: docker-registry-dockerhub
+  name: username
+---
+kind: secret
+name: dockerhub_password
+get:
+  path: docker-registry-dockerhub
+  name: password

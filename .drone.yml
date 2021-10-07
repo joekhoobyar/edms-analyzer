@@ -27,7 +27,6 @@ steps:
     image: plugins/docker
     settings:
       repo: joekhoobyar/edms-analyzer
-      insecure: true
       username:
         from_secret: dockerhub_username
       password:

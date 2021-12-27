@@ -2,6 +2,7 @@
 
 require 'async/http/endpoint'
 require 'async/rest/representation'
+require 'pp'
 
 module EDMS
   # Parent namespace of all +mayan-edms+ models.
@@ -71,6 +72,9 @@ module EDMS
       def documents
         with Documents, path: 'documents/'
       end
+      def documents_add
+        with Documents, path: 'documents/add/'
+      end
     end
 
     # Represents "document pages" in +mayan-edms+.
@@ -94,8 +98,12 @@ module EDMS
         with Tags, path: 'tags/'
       end
 
+      def tags_attach
+        with Tags, path: 'tags/attach/'
+      end
+
       def latest_version
-        subresource DocumentVersion, value[:latest_version]
+        subresource DocumentVersion, value[:version_active]
       end
 
       def document_type
@@ -114,7 +122,7 @@ module EDMS
     # Represents a "document version" in +mayan-edms+.
     class DocumentVersion < Representation
       def pages
-        related DocumentPages, value[:pages_url]
+        related DocumentPages, value[:page_list_url]
       end
 
       def ocr_content

@@ -58,14 +58,14 @@ module EDMS
     def assign_document_tag(mayan_doc, tag_id)
       logger.info "Tagging document ##{mayan_doc.value[:id]} => tag ##{tag_id}"
       handle_response do
-        mayan_doc.tags.post('tag_pk' => tag_id)
+        mayan_doc.tags_attach.post('tag_id' => tag_id)
       end
     end
 
     def assign_cabinet_document(cabinet, mayan_doc)
       logger.info "Assigning document ##{mayan_doc.value[:id]} => cabinet ##{cabinet.value[:id]}"
       handle_response do
-        cabinet.documents.post('documents_pk_list' => mayan_doc.value[:id].to_s)
+        cabinet.documents_add.post('document' => mayan_doc.value[:id].to_s)
       end
     end
 
@@ -79,7 +79,7 @@ module EDMS
     def write_document_type(mayan_doc, doctype)
       logger.info "Writing document ##{mayan_doc.value[:id]} => type ##{doctype}"
       handle_response do
-        mayan_doc.with(path: 'type/change/').post('new_document_type' => doctype)
+        mayan_doc.with(path: 'type/change/').post('document_type_id' => doctype)
       end
     end
 
@@ -92,7 +92,7 @@ module EDMS
         if (metadata = mayan_doc.document_metadata_map[metadata_name])
           metadata.patch('value' => metadata_value)
         elsif (metadata_id = mayan_doc.document_type.metadata_type_map[metadata_name])
-          mayan_doc.document_metadata.post 'metadata_type_pk' => metadata_id,
+          mayan_doc.document_metadata.post 'metadata_type_id' => metadata_id,
                                                       'value' => metadata_value
         else
           raise ArgumentError, "no such metadata key: #{metadata_name}"
@@ -111,7 +111,7 @@ module EDMS
 
     def with_client(now: true)
       result = nil
-      task = Mayan::Client.for "#{connection[:url]}/api/", client_headers do |client|
+      task = Mayan::Client.for "#{connection[:url]}/api/v4/", client_headers do |client|
         result = yield client
       end
       task.wait if now

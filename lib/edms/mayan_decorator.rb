@@ -58,7 +58,7 @@ module EDMS
     def assign_document_tag(mayan_doc, tag_id)
       logger.info "Tagging document ##{mayan_doc.value[:id]} => tag ##{tag_id}"
       handle_response do
-        mayan_doc.tags_attach.post('tag_id' => tag_id)
+        mayan_doc.tags_attach.post('tag' => tag_id)
       end
     end
 

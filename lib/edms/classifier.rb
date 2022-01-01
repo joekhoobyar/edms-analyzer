@@ -24,7 +24,7 @@ module EDMS
 
     # Can modify pattern matched capture data.
     class CaptureModifier < Dry::Struct
-      attribute  :type, Types::Coercible::Symbol.enum(:metadata, :sprintf, :tax_year, :currency,
+      attribute  :type, Types::Coercible::Symbol.enum(:metadata, :sprintf, :alnum_sanitize, :date_format, :tax_year, :currency,
                                                       :prev_day, :next_day,
                                                       :month_number, :month_start, :month_end,
                                                       :prev_month, :next_month)
@@ -55,6 +55,20 @@ module EDMS
       def transform_sprintf(value)
         value.sub!(/^0+([1-9])/, '\1') if value.is_a? String
         args[0] % [value]
+      end
+
+      def transform_alnum_sanitize(value)
+        $stderr.puts "pre-sanitize:  #{value.inspect}"
+        value.gsub!(/[\s\n]+/, ' ') if value.is_a? String
+        value.gsub!(/[^a-z0-9A-Z\s]/, '') if value.is_a? String
+        value.strip! if value.is_a? String
+        $stderr.puts "post-sanitize: #{value.inspect}"
+        value
+      end
+
+      def transform_date_format(value)
+        d = Date.parse(value)
+        d.strftime(args[0] || '%Y-%m-%d')
       end
 
       def transform_currency(value)

@@ -34,13 +34,13 @@ steps:
 kind: secret
 name: docker_username
 get:
-  path: docker-registry-admin
+  path: harbor-drone
   name: username
 ---
 kind: secret
 name: docker_password
 get:
-  path: docker-registry-admin
+  path: harbor-drone
   name: password
 ---
 kind: secret

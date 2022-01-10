@@ -134,7 +134,7 @@ describe EDMS::MayanDecorator do
         expect(subject).to receive(:write_document_metadata)
           .with(mayan_document, 'bar', 'foo').and_call_original
         expect(mayan_document_metadatas).to receive(:post)
-          .with('metadata_type_pk' => 1234, 'value' => 'foo')
+          .with('metadata_type_id' => 1234, 'value' => 'foo')
         subject.decorate(document)
       end
     end

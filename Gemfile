@@ -8,6 +8,7 @@ gem 'dry-types',      '~> 1.0', '< 2.0'
 gem 'falcon'
 gem 'ice_nine'
 gem 'roda'
+gem 'rack', '~> 2.2.3'
 
 group :development do
   gem 'awesome_print'
@@ -18,6 +19,7 @@ group :development do
   gem 'build-harness', '~> 0.4', '< 1.0'
   gem 'build-harness-config'
   gem 'build-harness-machines'
+  gem 'activesupport', '~> 6.0.0'
 
   gem 'faker'
   gem 'guard'

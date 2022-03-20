@@ -1,6 +1,7 @@
 #!/usr/bin/env bundle exec ruby
 # frozen_string_literal: true
 
+require 'pp'
 require 'json'
 require 'async'
 require 'async/http/internet'
@@ -21,8 +22,10 @@ Async do
       body = {
         id: mayan_doc.value[:id],
         type: mayan_doc.value[:document_type][:id],
-        text: mayan_doc.latest_version.ocr_content
       }
+
+      body[:text] = mayan_doc.first_file.content&.strip
+      body[:text] = mayan_doc.latest_version.ocr_content if (body[:text]&.length || 0) == 0
 
       puts "reanalyzing document ##{id}"
       url = ENV.fetch('ANALYZER_URL', 'http://localhost:9292/analyses/documents')

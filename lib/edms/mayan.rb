@@ -102,6 +102,14 @@ module EDMS
         with Tags, path: 'tags/attach/'
       end
 
+      def files
+        related DocumentFiles, value[:file_list_url]
+      end
+
+      def first_file
+        files.first
+      end
+
       def latest_version
         subresource DocumentVersion, value[:version_active]
       end
@@ -116,6 +124,42 @@ module EDMS
 
       def document_metadata_map!(from = document_metadata)
         Hash[from.all.map { |r| [r.value[:metadata_type][:name], r] }]
+      end
+    end
+
+    # Represents "document files" in +mayan-edms+.
+    class DocumentFiles < Paginated
+      def representation
+        DocumentFile
+      end
+    end
+
+    # Represents a "document file" in +mayan-edms+.
+    class DocumentFile < Representation
+      def pages
+        related DocumentFilePages, value[:page_list_url]
+      end
+
+      def content
+        pages.map(&:text_content).join("\n")
+      end
+    end
+
+    # Represents "document pages" in +mayan-edms+.
+    class DocumentFilePages < Paginated
+      def representation
+        DocumentFilePage
+      end
+    end
+
+    # Represents a "document page" in +mayan-edms+.
+    class DocumentFilePage < Representation
+      def content
+        with Representation, path: 'content/'
+      end
+
+      def text_content
+        content.value[:content]
       end
     end
 

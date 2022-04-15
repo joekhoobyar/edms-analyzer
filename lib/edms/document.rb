@@ -8,11 +8,15 @@ module EDMS
   class Document < Dry::Struct
     attribute? :id,       Types::ModelKey
     attribute? :type,     Types::Any
-    attribute  :text,     Types::String
+    attribute? :text,     Types::String
     attribute  :metadata, Types::MetadataMap
 
     def with_metadata(new_metadata)
       self.class.new attributes.merge(metadata: metadata.merge(new_metadata))
+    end
+
+    def with_text(new_text)
+      self.class.new attributes.merge(text: new_text)
     end
   end
 end

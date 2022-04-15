@@ -47,17 +47,49 @@ module EDMS
           analyzer = EDMS::TextAnalyzer.new(**config['edms']['text_analyzer'].transform_keys(&:to_sym))
 
           r.post 'documents' do
+            # Construct the document from the request.
             document = Document.new r.POST.transform_keys(&:to_sym)
-            document = analyzer.call document
-            logger.info "Queuing document ##{document.id} for classification"
 
+            # Background task to analyze the document.
             Async do
-              MayanDecorator.new.decorate document
-              logger.info "Classified document ##{document.id}"
+              decorator = MayanDecorator.new
+
+              # Retrieve the text if it doesn't exist yet.
+              if document.text.blank?
+                logger.info "Retrieving text for document ##{document.id}"
+
+                # Try file content first, falling back on OCR.
+                document = document.with_text(decorator.with_client do |client|
+                  mayan_doc = client.document(document.id)
+                  mayan_doc.first_file.content&.strip.presence || mayan_doc.latest_version.ocr_content&.strip
+                end)
+              end
+
+              # If the text if present:  scrub, analyze, classify
+              if document.text.present?
+                # Scrub
+                document = document.with_text(document.text.scrub.force_encoding('UTF-8').
+                                              gsub(/[^[:ascii:]]/i, ' ').
+                                              gsub(/[^[:alnum:][:punct:][:space:]]/i, ' ').
+                                              strip)
+
+                # Analyze the document text.
+                logger.info "Analyzing document ##{document.id}"
+                document = analyzer.call document
+
+                # Classify the document in the background.
+                logger.info "Classifying document ##{document.id}"
+                decorator.decorate document
+
+                logger.info "Done with ##{document.id}"
+              else
+                logger.error "Cannot classify empty text in document ##{document.id}"
+              end
             end
 
+            # Return the response.
             response.status = 201
-            { 'message' => "Classifying document ##{document.id}", 'result' => [] }
+            { 'message' => "Queueing document ##{document.id} for classification", 'result' => [] }
           end
         end
       end

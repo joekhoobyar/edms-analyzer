@@ -3,6 +3,7 @@
 require 'dry-types'
 require 'ice_nine'
 require 'ice_nine/core_ext/object'
+require 'active_support/core_ext/object/blank'
 
 # Parent namespace for EDMS analysis logic.
 module EDMS

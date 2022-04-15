@@ -53,6 +53,15 @@ module EDMS
       end
     end
 
+    def with_client(now: true)
+      result = nil
+      task = Mayan::Client.for "#{connection[:url]}/api/v4/", client_headers do |client|
+        result = yield client
+      end
+      task.wait if now
+      now ? result : task
+    end
+
     protected
 
     def assign_document_tag(mayan_doc, tag_id)
@@ -107,15 +116,6 @@ module EDMS
       raise Async::REST::ResponseError, response unless response.success?
     ensure
       response.close if response
-    end
-
-    def with_client(now: true)
-      result = nil
-      task = Mayan::Client.for "#{connection[:url]}/api/v4/", client_headers do |client|
-        result = yield client
-      end
-      task.wait if now
-      now ? result : task
     end
 
     def client_headers

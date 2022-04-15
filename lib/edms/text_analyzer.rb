@@ -15,7 +15,9 @@ module EDMS
     # @return [EDMS::Document]
     #   either a newly classified document, or the unmodified original document
     def call(document)
-      @classifiers.inject(document) { |accum, classifier| classifier.call(accum) }
+      @classifiers.inject(document) do |accum, classifier|
+        classifier.call(accum)
+      end
     end
   end
 end

@@ -1,8 +1,8 @@
-FROM alpine:3.11
+FROM alpine:3.13
 
 LABEL maintainer="Joe Khoobyar fourheads@gmail.com"
 
-ARG RUBY_VERSIONSPEC="<2.7"
+ARG RUBY_VERSIONSPEC="<2.8"
 ARG BUNDLER_VERSIONSPEC="<3.0"
 
 # Baseline installation.
@@ -51,12 +51,12 @@ RUN bundle package
 # Cleanup from prior steps
 USER root
 RUN apk --purge del .build-deps \
-    && rm -f /var/cache/apk/* \
+    && rm -f /var/cache/apk/*
 
 # Final settings
 USER svc
 ENV HOME=/home/svc
-ENV PATH="$HOME/.gem/ruby/2.6.0/bin:$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ENV PATH="$HOME/.gem/ruby/2.7.0/bin:$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 ENTRYPOINT ["bundle", "exec"]
 

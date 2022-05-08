@@ -69,7 +69,6 @@ module EDMS
               if document.text.present?
                 # Scrub
                 document = document.with_text(document.text.scrub.force_encoding('UTF-8').
-                                              gsub(/[^[:ascii:]]/i, ' ').
                                               gsub(/[^[:alnum:][:punct:][:space:]]/i, ' ').
                                               strip)
 

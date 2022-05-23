@@ -58,11 +58,9 @@ module EDMS
       end
 
       def transform_alnum_sanitize(value)
-        $stderr.puts "pre-sanitize:  #{value.inspect}"
         value.gsub!(/[\s\n]+/, ' ') if value.is_a? String
         value.gsub!(/[^a-z0-9A-Z\s]/, '') if value.is_a? String
         value.strip! if value.is_a? String
-        $stderr.puts "post-sanitize: #{value.inspect}"
         value
       end
 
@@ -172,7 +170,14 @@ module EDMS
           end
         end
 
-      modifiers.each { |modifier| modifier.call(captures, doc.metadata) }
+      modifiers.each do |modifier|
+        begin
+          modifier.call(captures, doc.metadata)
+        rescue => e
+          $stderr.puts "Error from: #{modifier.inspect}"
+          raise
+        end
+      end
 
       Hash[metadata.map do |key, value|
         [key, value.is_a?(String) ? value.gsub(/\\\d{1}/, captures) : value]

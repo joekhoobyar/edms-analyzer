@@ -16,7 +16,12 @@ module EDMS
     #   either a newly classified document, or the unmodified original document
     def call(document)
       @classifiers.inject(document) do |accum, classifier|
-        classifier.call(accum)
+        begin
+          classifier.call(accum)
+        rescue => e
+          $stderr.puts "Error from: #{classifier.inspect}"
+          raise
+        end
       end
     end
   end

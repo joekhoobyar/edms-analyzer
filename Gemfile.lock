@@ -668,7 +668,7 @@ GEM
       pastel (~> 0.7.2)
       strings (~> 0.1.5)
       tty-screen (~> 0.7)
-    tzinfo (1.2.9)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
     uber (0.1.0)
     unf (0.1.4)

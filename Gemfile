@@ -8,7 +8,7 @@ gem 'dry-types',      '~> 1.0', '< 2.0'
 gem 'falcon'
 gem 'ice_nine'
 gem 'roda'
-gem 'rack', '~> 2.2.3'
+gem 'rack', '~> 2.2.6'
 
 group :development do
   gem 'awesome_print'
